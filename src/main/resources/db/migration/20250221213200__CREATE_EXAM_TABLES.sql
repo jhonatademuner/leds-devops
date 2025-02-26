@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS texam (
+	id UUID NOT NULL,
+	agency VARCHAR(128) NOT NULL,
+	notice VARCHAR(16) NOT NULL,
+	code VARCHAR(32) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS texam_role (
+	exam_id UUID NOT NULL,
+	role_id UUID NOT NULL,
+	PRIMARY KEY (exam_id, role_id),
+	FOREIGN KEY (exam_id) REFERENCES texam(id) ON DELETE CASCADE,
+	FOREIGN KEY (role_id) REFERENCES trole(id) ON DELETE CASCADE
+);

@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS trole (
+	id UUID NOT NULL,
+	name VARCHAR(255),
+	PRIMARY KEY (id)
+);
