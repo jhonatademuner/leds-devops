@@ -1,5 +1,5 @@
 # Desafio DevOps - LEDS
-*Bem-vindo!* 👋
+*Bem-vindo!* 
 
 Neste desafio, você terá a oportunidade de demonstrar que possui as habilidades necessárias para atuar no time de DevOps do laboratório.
 
