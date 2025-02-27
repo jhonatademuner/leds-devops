@@ -3,14 +3,12 @@ package com.concursomatch.service.candidate;
 import com.concursomatch.domain.candidate.Candidate;
 import com.concursomatch.domain.candidate.dto.CandidateDTO;
 import com.concursomatch.domain.candidate.dto.SimplifiedCandidateDTO;
-import com.concursomatch.domain.exam.Exam;
 import com.concursomatch.domain.role.Role;
 import com.concursomatch.repository.candidate.CandidateRepository;
 import com.concursomatch.service.role.RoleService;
 import com.concursomatch.util.assembler.CandidateAssembler;
-import com.concursomatch.util.assembler.ExamAssembler;
 import com.concursomatch.util.assembler.RoleAssembler;
-import com.concursomatch.util.exception.CandidateAlreadyExists;
+import com.concursomatch.util.exception.CandidateAlreadyExistsException;
 import com.concursomatch.util.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,7 @@ public class CandidateService {
 
     public CandidateDTO create(CandidateDTO candidateDTO) {
         Optional<Candidate> existingEntity = candidateRepository.findByCitizenId(candidateDTO.getCitizenId());
-        if(existingEntity.isPresent()) throw new CandidateAlreadyExists("Candidate already exists with CITIZEN_ID:" + candidateDTO.getCitizenId());
+        if(existingEntity.isPresent()) throw new CandidateAlreadyExistsException("Candidate already exists with CITIZEN_ID:" + candidateDTO.getCitizenId());
         Set<Role> roles = RoleAssembler.toEntitySet(roleService.createRolesIfNotExists(candidateDTO.getRoles()));
         Candidate entity = candidateRepository.save(CandidateAssembler.toEntity(candidateDTO, roles));
         return CandidateAssembler.toDTO(entity);
