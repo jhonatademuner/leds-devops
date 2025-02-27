@@ -30,9 +30,9 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build docker image
-        run: docker build -t leds-devops-jhonatademuner .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest .
       - name: Publish image to Docker Hub
-        run: docker push leds-devops-jhonatademuner:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
 
   sonar:
     needs: build
@@ -62,9 +62,10 @@ jobs:
       - aws-ec2-leds-devops
     steps:
       - name: Pull image from Docker Hub
-        run: docker pull leds-devops-jhonatademuner:latest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
       - name: Delete old container
-        run: docker rm -f leds-devops-jhonatademuner-container
+        run: docker rm -f leds-devops-container || true
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name leds-devops-jhonatademuner-container leds-devops-jhonatademuner
+        run: docker run -d -p 8080:8080 --name leds-devops-container ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
+      
 
