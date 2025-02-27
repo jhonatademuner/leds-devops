@@ -18,6 +18,8 @@ public class ExamDTO {
     private String agency;
     private String notice;
     private String code;
+
+    @Builder.Default
     private Set<String> roles = new HashSet<>();
 
 }
