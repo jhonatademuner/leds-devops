@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.concursomatch</groupId>
 	<artifactId>concursomatch</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>ConcursoMatch</name>
 	<description>API para fazer o Match entre Concursos e candidatos</description>
 	<url/>

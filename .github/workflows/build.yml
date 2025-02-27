@@ -1,22 +1,44 @@
-name: SonarQube
+name: CI/CD Pipeline
 on:
   push:
     branches:
       - main
 
 jobs:
+
   build:
-    name: Build and analyze
+    name: Build and Test
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'temurin' 
+          distribution: 'temurin'
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build Project
+        run: mvn clean install
+      - name: Login to Docker Hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build docker image
+        run: docker build -t leds-devops-jhonatademuner .
+      - name: Publish image to Docker Hub
+        run: docker push leds-devops-jhonatademuner:latest
+
+  sonar:
+    needs: build
+    name: SonarQube Analysis
+    runs-on: ubuntu-22.04
+    steps:
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -33,3 +55,16 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=jhonatademuner_leds-devops
+
+  deploy:
+    needs: build
+    runs-on:
+      - aws-ec2-leds-devops
+    steps:
+      - name: Pull image from Docker Hub
+        run: docker pull leds-devops-jhonatademuner:latest
+      - name: Delete old container
+        run: docker rm -f leds-devops-jhonatademuner-container
+      - name: Run Docker Container
+        run: docker run -d -p 8080:8080 --name leds-devops-jhonatademuner-container leds-devops-jhonatademuner
+
