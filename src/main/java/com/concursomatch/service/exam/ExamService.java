@@ -8,7 +8,7 @@ import com.concursomatch.repository.exam.ExamRepository;
 import com.concursomatch.service.role.RoleService;
 import com.concursomatch.util.assembler.ExamAssembler;
 import com.concursomatch.util.assembler.RoleAssembler;
-import com.concursomatch.util.exception.ExamAlreadyExists;
+import com.concursomatch.util.exception.ExamAlreadyExistsException;
 import com.concursomatch.util.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class ExamService {
     @Transactional
     public ExamDTO create(ExamDTO examDTO){
         Optional<Exam> existingEntity = examRepository.findByCode(examDTO.getCode());
-        if(existingEntity.isPresent()) throw new ExamAlreadyExists("Exam already exists with CODE:" + examDTO.getCode());
+        if(existingEntity.isPresent()) throw new ExamAlreadyExistsException("Exam already exists with CODE:" + examDTO.getCode());
         Set<Role> roles = RoleAssembler.toEntitySet(roleService.createRolesIfNotExists(examDTO.getRoles()));
         Exam entity = examRepository.save(ExamAssembler.toEntity(examDTO, roles));
         return ExamAssembler.toDTO(entity);
