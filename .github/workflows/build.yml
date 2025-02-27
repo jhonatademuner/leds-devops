@@ -62,10 +62,10 @@ jobs:
       - aws-ec2-leds-devops
     steps:
       - name: Pull image from Docker Hub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
       - name: Delete old container
-        run: docker rm -f leds-devops-container || true
+        run: sudo docker rm -f leds-devops-container || true
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name leds-devops-container ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
-      
+        run: sudo docker run -d -p 8080:8080 --name leds-devops-container ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
+
 
