@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 
 public class CandidateAssembler {
 
+    private CandidateAssembler(){
+        throw new IllegalStateException("Utility Class");
+    }
+
     public static Candidate toEntity(CandidateDTO dto, Set<Role> roles) {
         return Candidate.builder()
                 .id(dto.getId() != null ? UUID.fromString(dto.getId()) : null)
@@ -62,6 +66,6 @@ public class CandidateAssembler {
         if (candidates == null) return List.of();
         return candidates.stream()
                 .map(CandidateAssembler::toSimplifiedDTO)
-                .collect(Collectors.toList());
+                .toList();
 	}
 }

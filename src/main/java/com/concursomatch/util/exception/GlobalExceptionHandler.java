@@ -16,12 +16,12 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-		logger.warn("Resource not found at {}: {}", path, ex.getMessage(), ex);
+		LOG.warn("Resource not found at {}: {}", path, ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = ErrorResponse.builder()
 				.timestamp(new Date())
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			ExamAlreadyExistsException.class})
 	public ResponseEntity<Object> handleAlreadyExistsException(ResourceNotFoundException ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-		logger.warn("Entity already exists excption at {}: {}", path, ex.getMessage(), ex);
+		LOG.warn("Entity already exists excption at {}: {}", path, ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = ErrorResponse.builder()
 				.timestamp(new Date())
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-		logger.error("Runtime exception at {}: {}", path, ex.getMessage(), ex);
+		LOG.error("Runtime exception at {}: {}", path, ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = ErrorResponse.builder()
 				.timestamp(new Date())
@@ -67,10 +67,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(Exception.class)
+	@ExceptionHandler({Exception.class, IllegalStateException.class})
 	public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-		logger.error("Unhandled exception at {}: {}", path, ex.getMessage(), ex);
+		LOG.error("Unhandled exception at {}: {}", path, ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = ErrorResponse.builder()
 				.timestamp(new Date())

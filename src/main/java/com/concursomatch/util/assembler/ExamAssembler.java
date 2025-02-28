@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 
 public class ExamAssembler {
 
+    private ExamAssembler(){
+        throw new IllegalStateException("Utility Class");
+    }
+
     public static Exam toEntity(ExamDTO dto, Set<Role> roles) {
         return Exam.builder()
                 .id(dto.getId() == null ? null : UUID.fromString(dto.getId()))
@@ -37,10 +41,6 @@ public class ExamAssembler {
     }
 
     public static SimplifiedExamDTO toSimplifiedDTO(Exam exam) {
-        Set<String> roleIds = exam.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
-
         return SimplifiedExamDTO.builder()
                 .agency(exam.getAgency())
                 .notice(exam.getNotice())
@@ -66,6 +66,6 @@ public class ExamAssembler {
         if (exams == null) return List.of();
         return exams.stream()
                 .map(ExamAssembler::toSimplifiedDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

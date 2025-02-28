@@ -48,7 +48,7 @@ public class CandidateService {
     }
 
     public CandidateDTO update(CandidateDTO candidateDTO) {
-        Candidate existingCandidate = candidateRepository.findById(UUID.fromString(candidateDTO.getId()))
+        candidateRepository.findById(UUID.fromString(candidateDTO.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with ID: " + candidateDTO.getId()));
         Set<Role> roles = RoleAssembler.toEntitySet(roleService.createRolesIfNotExists(candidateDTO.getRoles()));
         Candidate updatedCandidate = CandidateAssembler.toEntity(candidateDTO, roles);
