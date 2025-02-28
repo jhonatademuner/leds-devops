@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 public class RoleAssembler {
 
+    private RoleAssembler(){
+        throw new IllegalStateException("Utility Class");
+    }
+
     public static Role toEntity(RoleDTO dto) {
         return Role.builder()
                 .id(UUID.fromString(dto.getId()))
