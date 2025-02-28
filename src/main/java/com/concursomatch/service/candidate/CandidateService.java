@@ -62,6 +62,13 @@ public class CandidateService {
         return CandidateAssembler.toDTO(entity);
     }
 
+    public CandidateDTO deleteByCitizenId(String id) {
+        Candidate entity = candidateRepository.findByCitizenId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with ID: " + id));
+        candidateRepository.delete(entity);
+        return CandidateAssembler.toDTO(entity);
+    }
+
     public List<SimplifiedCandidateDTO> matchByRoles(Set<String> roleNames) {
         List<Candidate> matchedCandidates = candidateRepository.matchByRoles(roleNames);
         return CandidateAssembler.toSimplifiedDTOList(matchedCandidates);
