@@ -61,13 +61,15 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Run Tests and Generate Coverage Report
-        run: mvn clean verify -Pcoverage
+        run: mvn clean verify -Pcoverage -Dsonar.token=${{ secrets.SONAR_TOKEN }}
       - name: Build and analyze with SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.projectKey=jhonatademuner_leds-devops \
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        run: mvn sonar:sonar -Dsonar.projectKey=jhonatademuner_leds-devops \
+          -Dsonar.organization=jhonata-demuner-org \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
   deploy:
     needs: build

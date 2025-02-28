@@ -6,31 +6,21 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.concursomatch</groupId>
 	<artifactId>concursomatch</artifactId>
 	<version>1.0.0</version>
 	<name>ConcursoMatch</name>
 	<description>API para fazer o Match entre Concursos e candidatos</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+
 	<properties>
 		<java.version>21</java.version>
 		<sonar.organization>jhonata-demuner-org</sonar.organization>
+		<sonar.projectKey>jhonatademuner_leds-devops</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -63,16 +53,26 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- JaCoCo plugin dependency -->
-		<dependency>
-			<groupId>org.jacoco</groupId>
-			<artifactId>jacoco-maven-plugin</artifactId>
-			<version>0.8.12</version>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<!-- SonarQube Maven Plugin -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>5.0.0.4389</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>sonar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Compiler Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -85,6 +85,8 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+
+			<!-- Spring Boot Maven Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -98,13 +100,12 @@
 				</configuration>
 			</plugin>
 
-			<!-- JaCoCo Plugin configuration for coverage -->
+			<!-- JaCoCo Plugin for Test Coverage -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.12</version>
 				<executions>
-					<!-- Prepare agent before tests -->
 					<execution>
 						<id>prepare-agent</id>
 						<phase>initialize</phase>
@@ -112,11 +113,9 @@
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
-
-					<!-- Generate report after tests -->
 					<execution>
 						<id>report</id>
-						<phase>test</phase>
+						<phase>verify</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
@@ -144,12 +143,14 @@
 						<executions>
 							<execution>
 								<id>prepare-agent</id>
+								<phase>initialize</phase>
 								<goals>
 									<goal>prepare-agent</goal>
 								</goals>
 							</execution>
 							<execution>
 								<id>report</id>
+								<phase>verify</phase>
 								<goals>
 									<goal>report</goal>
 								</goals>
