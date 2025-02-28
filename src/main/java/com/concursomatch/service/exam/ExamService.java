@@ -44,7 +44,7 @@ public class ExamService {
     }
 
     public ExamDTO update(ExamDTO examDTO) {
-        Exam existingExam = examRepository.findById(UUID.fromString(examDTO.getId()))
+        examRepository.findById(UUID.fromString(examDTO.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found with ID: " + examDTO.getId()));
         Set<Role> roles = RoleAssembler.toEntitySet(roleService.createRolesIfNotExists(examDTO.getRoles()));
         Exam updatedExam = ExamAssembler.toEntity(examDTO, roles);

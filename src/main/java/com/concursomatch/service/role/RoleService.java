@@ -39,7 +39,7 @@ public class RoleService {
     }
 
     public RoleDTO update(RoleDTO roleDTO) {
-        Role existingRole = roleRepository.findById(UUID.fromString(roleDTO.getId()))
+        roleRepository.findById(UUID.fromString(roleDTO.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + roleDTO.getId()));
         Role updatedRole = RoleAssembler.toEntity(roleDTO);
         return RoleAssembler.toDTO(roleRepository.save(updatedRole));
