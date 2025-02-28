@@ -1,10 +1,8 @@
 package com.concursomatch.domain.role;
 
-import com.concursomatch.domain.exam.Exam;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
