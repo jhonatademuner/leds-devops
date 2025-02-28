@@ -7,7 +7,7 @@ import com.concursomatch.domain.role.Role;
 import com.concursomatch.domain.role.dto.RoleDTO;
 import com.concursomatch.repository.exam.ExamRepository;
 import com.concursomatch.service.role.RoleService;
-import com.concursomatch.util.exception.ExamAlreadyExistsException;
+import com.concursomatch.util.exception.CandidateAlreadyExistsException;
 import com.concursomatch.util.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +61,7 @@ class ExamServiceTest {
 	void shouldThrowExceptionWhenExamAlreadyExists() {
 		when(examRepository.findByCode(examDTO.getCode())).thenReturn(Optional.of(exam));
 
-		assertThrows(ExamAlreadyExistsException.class, () -> examService.create(examDTO));
+		assertThrows(CandidateAlreadyExistsException.class, () -> examService.create(examDTO));
 	}
 
 	@Test
