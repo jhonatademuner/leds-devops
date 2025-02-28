@@ -24,6 +24,6 @@ hs_err_pid*
 replay_pid*
 
 # custom ignores
+*.properties
 target/
 
-src/main/resources/application.properties
