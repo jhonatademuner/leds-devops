@@ -25,10 +25,10 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build Project
-        run: mvn clean install
+      - name: Build Project and Run Tests with Coverage
+        run: mvn clean verify -Pcoverage
       - name: Login to Docker Hub
-        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Build docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest .
       - name: Publish image to Docker Hub
@@ -60,10 +60,14 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
+      - name: Run Tests and Generate Coverage Report
+        run: mvn clean verify -Pcoverage
+      - name: Build and analyze with SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=jhonatademuner_leds-devops
+        run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=jhonatademuner_leds-devops \
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   deploy:
     needs: build
@@ -76,5 +80,3 @@ jobs:
         run: sudo docker rm -f leds-devops-container || true
       - name: Run Docker Container
         run: sudo docker run -d -p 8080:8080 --name leds-devops-container ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
-
-
