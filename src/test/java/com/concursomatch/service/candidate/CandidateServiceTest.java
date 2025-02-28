@@ -7,8 +7,6 @@ import com.concursomatch.domain.role.Role;
 import com.concursomatch.domain.role.dto.RoleDTO;
 import com.concursomatch.repository.candidate.CandidateRepository;
 import com.concursomatch.service.role.RoleService;
-import com.concursomatch.util.assembler.CandidateAssembler;
-import com.concursomatch.util.assembler.RoleAssembler;
 import com.concursomatch.util.exception.CandidateAlreadyExistsException;
 import com.concursomatch.util.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
