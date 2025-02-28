@@ -139,6 +139,25 @@ class CandidateServiceTest {
 	}
 
 	@Test
+	void shouldDeleteCandidateByCitizenIdSuccessfully() {
+		when(candidateRepository.findByCitizenId(candidateDTO.getCitizenId())).thenReturn(Optional.of(candidate));
+		doNothing().when(candidateRepository).delete(candidate);
+
+		CandidateDTO result = candidateService.deleteByCitizenId(candidateDTO.getCitizenId());
+
+		assertNotNull(result);
+		assertEquals(candidateDTO.getCitizenId(), result.getCitizenId());
+		verify(candidateRepository).delete(candidate);
+	}
+
+	@Test
+	void shouldThrowExceptionWhenDeletingNonExistentCandidateByCitizenId() {
+		when(candidateRepository.findByCitizenId(anyString())).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> candidateService.deleteByCitizenId(candidateDTO.getCitizenId()));
+	}
+
+	@Test
 	void shouldMatchCandidatesByRoles() {
 		when(candidateRepository.matchByRoles(anySet())).thenReturn(List.of(candidate));
 

@@ -33,8 +33,23 @@ public class CandidateController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CandidateDTO> deleteCandidate(@PathVariable String id) {
+    public ResponseEntity<CandidateDTO> deleteCandidateById(@PathVariable String id) {
         CandidateDTO deletedCandidate = candidateService.deleteById(id);
         return ResponseEntity.ok(deletedCandidate);
     }
+
+    @GetMapping("")
+    public ResponseEntity<CandidateDTO> getCandidateByCitizenId(@RequestParam String citizenId) {
+        CandidateDTO candidateDTO = candidateService.findByCitizenId(citizenId);
+        return ResponseEntity.ok(candidateDTO);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<CandidateDTO> deleteCandidateByCitizenId(@RequestParam String citizenId) {
+        CandidateDTO deletedCandidate = candidateService.deleteByCitizenId(citizenId);
+        return ResponseEntity.ok(deletedCandidate);
+    }
+
+
+
 }
