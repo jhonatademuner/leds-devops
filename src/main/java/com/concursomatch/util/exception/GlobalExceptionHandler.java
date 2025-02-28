@@ -19,7 +19,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+	public ResponseEntity<Object> handleResourceNotFoundException(Exception ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
 		LOG.warn("Resource not found at {}: {}", path, ex.getMessage(), ex);
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler({CandidateAlreadyExistsException.class,
 			ExamAlreadyExistsException.class})
-	public ResponseEntity<Object> handleAlreadyExistsException(ResourceNotFoundException ex, WebRequest request) {
+	public ResponseEntity<Object> handleAlreadyExistsException(Exception ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
 		LOG.warn("Entity already exists excption at {}: {}", path, ex.getMessage(), ex);
 
@@ -48,11 +48,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.path(path)
 				.build();
 
-		return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
+	public ResponseEntity<Object> handleRuntimeException(Exception ex, WebRequest request) {
 		String path = ((ServletWebRequest) request).getRequest().getRequestURI();
 		LOG.error("Runtime exception at {}: {}", path, ex.getMessage(), ex);
 
