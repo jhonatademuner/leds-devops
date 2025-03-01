@@ -38,13 +38,13 @@ public class CandidateController {
         return ResponseEntity.ok(deletedCandidate);
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<CandidateDTO> getCandidateByCitizenId(@RequestParam String citizenId) {
         CandidateDTO candidateDTO = candidateService.findByCitizenId(citizenId);
         return ResponseEntity.ok(candidateDTO);
     }
 
-    @DeleteMapping("")
+    @DeleteMapping
     public ResponseEntity<CandidateDTO> deleteCandidateByCitizenId(@RequestParam String citizenId) {
         CandidateDTO deletedCandidate = candidateService.deleteByCitizenId(citizenId);
         return ResponseEntity.ok(deletedCandidate);
