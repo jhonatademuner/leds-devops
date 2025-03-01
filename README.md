@@ -1,104 +1,214 @@
-# Desafio DevOps - LEDS
-*Bem-vindo!* 
+<h1 align="center" style="font-weight: bold;">Leds DevOps Challenge 💻</h1>
 
-Neste desafio, você terá a oportunidade de demonstrar que possui as habilidades necessárias para atuar no time de DevOps do laboratório.
+<p align="center">
+ <a href="#tech">Technologies</a> • 
+ <a href="#started">Getting Started</a> • 
+  <a href="#routes">API Endpoints</a> •
+ <a href="#colab">Collaborators</a> •
+ <a href="#contribute">Contribute</a>
+</p>
 
-# Contextualização
+<p>
+    This project was developed as part of a challenge for a job opportunity at LEDS. Its goal is to match candidates with government-offered job opportunity exams.
+    <br/>
+    The API was built using Spring Boot, following best practices such as Clean Code principles, comprehensive testing, and maintainable architecture.
+    <br/>
+    It features a complete CI/CD pipeline, automating the following steps using GitHub Actions:
+    <br/>
+    <ul>
+    <li><b>Build & Test:</b> Compiles and validates the API using Maven</li>
+    <li><b>Containerization:</b> Packages the application into a Docker container</li>
+    <li><b>Code Quality Analysis:</b> Runs static code analysis using SonarQube</li>
+    <li><b>Image Deployment:</b> Pushes the Docker image to Docker Hub</li>
+    <li><b>Server Deployment:</b> Pulls and deploys the containerized application on an AWS EC2 instance</li>
+    </ul>
+    Additionally, the application relies on an AWS RDS database for persistent storage, ensuring scalability and reliability.
+</p>
 
-O desafio é implementar uma automação de CI/CD usando Github Actions para um  programa que permita realizar as seguintes buscas: 
-1. Listar os **órgãos, códigos e editais dos concursos públicos** que se encaixam no perfil do candidato, tomando como base o seu **CPF**; 
-2. Listar o **nome, data de nascimento e o CPF** dos candidatos que se encaixam no perfil do concurso tomando com base o **Código do Concurso** do concurso público;
+<h2 id="technologies">💻 Technologies</h2>
 
-A automação deve realizar as seguintes automações:
-1. Executar os testes automatizados
-2. Verificar a qualidade do código
-3. Quebrar o CI quando os testes falharem ou quando a qualidade for menor de 80%
-4. Registrar o docker do software no Github Package
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![Apache Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=for-the-badge&logo=Apache%20Maven&logoColor=white)
+![jUnit](https://img.shields.io/badge/-jUnit-%2325A162?style=for-the-badge&logo=junit5&logoColor=white)
+![Mockito](https://img.shields.io/badge/-Mockito-%2372A928?style=for-the-badge&logo=mocha&logoColor=%23080808)
+![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![SonarQube](https://img.shields.io/badge/SonarQube-black?style=for-the-badge&logo=sonarqube&logoColor=4E9BCD)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
-O arquivo **candidatos.txt** contém as informações dos candidatos:
+<h2 id="started">🚀 Getting started</h2>
 
-| Nome  | Data de Nascimento  | CPF |  Profissões|
-|---|---|---|---|
-| Lindsey Craft  |  19/05/1976  |  182.845.084-34  |  [carpinteiro]  | 
-| Jackie Dawson  |  14/08/1970  |  311.667.973-47  |  [marceneiro, assistente administrativo]  |
-| Cory Mendoza |   11/02/1957 |  565.512.353-92  |  [carpinteiro, marceneiro] |
+<h3>📌 Prerequisites</h3>
 
-O arquivo **concursos.txt** contém as informações dos concursos públicos:
+Ensure you have the following installed:
 
-| Órgão  | Edital  | Código do Concurso | Lista de vagas|
-|---|---|---|---|
-| SEDU  | 9/2016  |  61828450843  |  [analista de sistemas, marceneiro]  | 
-| SEJUS | 15/2017  |  61828450843  |  [carpinteiro,professor de matemática,assistente administrativo] |
-| SEJUS | 17/2017 |  95655123539  |  [professor de matemática] |
+- [Java 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+- Maven: for [Ubuntu](https://maven.apache.org/download.cgi) or [MacOS](https://formulae.brew.sh/formula/maven)
+- [Docker](https://docs.docker.com/get-started/get-docker/)
 
-🤩 **As tecnologias a serem utilizadas na implementação da solução ficam a seu critério!**
+<h3>📥 Cloning</h3>
 
-# Como entregar?
-1. Faça um **fork** do repositório. Nesse fork esperamos encontrar uma documentação completa da solução e a listagem dos diferenciais implementados.
-2. Abra um **pull request (PR)** do seu fork para o nome repositório com o seu nome como título. Assim conseguimos te localizar melhor e ver que você já finalizou o desafio!
+Run the following command to clone the project:
 
-🚨 **Atenção**: você deve enviar apenas o código fonte. Não serão aceitos códigos compilados.
+```bash
+git clone https://github.com/jhonatademuner/leds-devops.git
+cd leds-devops
+```
 
-## Avaliação
+<h3>🛠️ Database Setup</h3>
 
-O programa será avaliado levando em conta os seguintes critérios:
+Before configuring the application, you need to set up a PostgreSQL 16 database using Docker.
 
-| Critério  | Valor | 
-|---|---|
-| Legibilidade do Código |  10  |
-| Documentação do código |  10  |
-| Documentação da solução |  10  |
-| Tratamento de Erros | 10 | 
-| Implementar testes unitários |  15  |
-| Implementar integração com [Github Action](https://github.com/features/actions)  |  10  |
-| Implementar integração com Github Action + SonarQube |  10  |
-| Implementar usando Docker | 5 |
-| Total | 90 |
+<b>1️⃣ Create a Volume for Data Persistence</b>
 
-A sua pontuação será a soma dos valores obtidos nos critérios acima.
+Run the following command to create a Docker volume:
 
-## Diferenciais 
-Você pode **aumentar sua pontuação** implementando os seguintes diferenciais:
+```bash
+docker volume create postgres_data
+```
 
-| Item  | Pontos Ganhos | 
-|---|---|
-| Criar um [serviço](https://martinfowler.com/articles/microservices.html) com o problema |  30  |
-| Utilizar banco de dados |  30  |
-| Implementar Clean Code |  20  |
-| Implementar o padrão de programação da tecnologia escolhida |  20  |
-| Implementar testes comportamentais |  15  |
-| Usar tecnologias de IaC (Terraform, ansible, HelmChart, etc)|15|
-| Total| 130 |
+<b>2️⃣ Start a PostgreSQL 16 Container with a Persistent Volume</b>
 
-A pontuação final será calculada somando os critérios obrigatórios e os diferenciais implementados corretamente.
+```bash
+docker run --name postgres-db \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=admin \
+  -e POSTGRES_DB=leds_devops \
+  -p 5432:5432 \
+  -v postgres_data:/var/lib/postgresql/data \
+  -d postgres:16
+```
 
-# Penalizações
+Explanation of the parameters:
+- `--name postgres-db` → Assigns a name to the container
+- `-e POSTGRES_USER=admin `→ Sets the database username to `admin`
+- `-e POSTGRES_PASSWORD=admin` → Sets the database password to `admin`
+- `-e POSTGRES_DB=leds_devops` → Creates a database named `leds_devops`
+- `-p 5432:5432` → Maps the local port 5432 to the container’s PostgreSQL port
+- `-v postgres_data:/var/lib/postgresql/data` → Persists database data in a Docker volume
+- `-d postgres:16` → Runs the container in the background using PostgreSQL 16
 
-Você será desclassificado se:
+<b>3️⃣ Verify if the Container is Running</b>
 
-1. Enviar uma solução que não funcione.
-2. Não cumprir os critérios da seção **Avaliação**.
-3. For identificado plágio.
-   
-***Que a força esteja com você. Boa sorte!***
+```bash
+docker ps
+```
 
-<div align="left">
-</div>
+<h3>⚙️ Configuring the Application</h2>
 
-###
+After setting up the database, update the `application.properties` file with your database credentials:
 
-<br clear="both">
+```properties
+sspring.datasource.url=jdbc:postgresql://localhost:5432/leds_devops
+spring.datasource.username=admin
+spring.datasource.password=admin
+```
 
-<div align="center">
-  <a href="https://www.linkedin.com/school/ledsifes" target="_blank">
-    <img src="https://img.shields.io/static/v1?message=LinkedIn&logo=linkedin&label=&color=0077B5&logoColor=white&labelColor=&style=for-the-badge" height="40" alt="linkedin logo"  />
-  </a>
-  <a href="https://www.instagram.com/ledsifes/" target="_blank">
-    <img src="https://img.shields.io/static/v1?message=Instagram&logo=instagram&label=&color=E4405F&logoColor=white&labelColor=&style=for-the-badge" height="40" alt="instagram logo"  />
-  </a>
-  <a href="https://www.youtube.com/@ledsifes/?sub_confirmation=1" target="_blank">
-    <img src="https://img.shields.io/static/v1?message=Youtube&logo=youtube&label=&color=FF0000&logoColor=white&labelColor=&style=for-the-badge" height="40" alt="youtube logo"  />
-  </a>
-</div>
+<h3>🚀 Running the Application</h3>
 
-###
+From the project root directory, execute:
+
+```bash
+mvn clean install    # Builds the project
+mvn spring-boot:run  # Starts the application
+```
+
+<h2 id="routes">📍 API Endpoints</h2>
+​
+The following endpoints are the core of the application, responsible for matching candidates with exams:
+
+| Route               | Description                                          
+|----------------------|-----------------------------------------------------
+| <kbd>GET /match/candidate/{citizenId}</kbd>     | Returns the exams that match the candidate roles. [SEE RESPONSE EXAMPLE](#match-candidate-detail)
+| <kbd>GET /match/exam/{examCode}</kbd>     | Returns the candidates that match the exam roles. [SEE RESPONSE EXAMPLE](#match-exam-detail)
+
+<h3 id="match-candidate-detail">🔎 GET /match/candidate/{citizenId}</h3>
+
+**📌 Response Example:**
+```json
+[
+  {
+    "agency": "SETADES",
+    "notice": "8/2016",
+    "code": "01403106938"
+  },
+  {
+    "agency": "SESA",
+    "notice": "9/2016",
+    "code": "22480949466"
+  },
+  ...
+]
+```
+
+<h3 id="match-exam-detail">🔎 GET /match/exam/{examCode}</h3>
+
+**📌 Response Example:**
+```json
+[
+   {
+    "name": "Nicole Spears",
+    "dateOfBirth": "1955-05-07T03:00:00.000+00:00",
+    "citizenId": "25144278168"
+  },
+  {
+    "name": "Tyrone Gaines",
+    "dateOfBirth": "1976-04-25T03:00:00.000+00:00",
+    "citizenId": "26401259887"
+  },
+  ...
+]
+```
+
+<h2>📜 Full API Documentation</h2>
+
+The API includes additional endpoints for managing candidates, exams, and  roles. The complete documentation is available through Swagger UI.
+
+**🔹 Access the Swagger Page:**
+
+```plaintext
+http://localhost:8080/swagger-ui/index.html
+```
+
+This allows you to explore all available endpoints, test requests, and check request/response formats. 🚀
+
+<h2 id="colab">🤝 Collaborators</h2>
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="#">
+        <img src="https://avatars.githubusercontent.com/u/103711264?v=4" width="100px;" alt="Jhonata Demuner Profile Picture"/><br>
+        <sub>
+          <b>Jhonata Demuner</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<h2 id="contribute">📫 Contribute</h2>
+
+Want to contribute? Follow these steps:
+
+1. Fork the repository
+2. Clone your fork:
+```bash
+git clone https://github.com/your-username/leds-devops.git
+cd leds-devops
+```
+
+3. Create a branch following the [naming convention](https://dev.to/couchcamote/git-branching-name-convention-cch):
+```bash
+git checkout -b feature/ISSUE-BEING-SOLVED
+```
+
+4. Follow ["Conventional Commits"](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages
+5. Open a Pull Request (PR) with a clear description of your changes
+
+<h3>Documentations that might help</h3>
+
+[📝 How to create a Pull Request](https://www.atlassian.com/br/git/tutorials/making-a-pull-request)
