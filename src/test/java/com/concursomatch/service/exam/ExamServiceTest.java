@@ -138,6 +138,26 @@ class ExamServiceTest {
 	}
 
 	@Test
+	void shouldDeleteExamByCodeSuccessfully() {
+		when(examRepository.findByCode(examDTO.getCode())).thenReturn(Optional.of(exam));
+		doNothing().when(examRepository).delete(exam);
+
+		ExamDTO result = examService.deleteByExamCode(examDTO.getCode());
+
+		assertNotNull(result);
+		assertEquals(examDTO.getCode(), result.getCode());
+		verify(examRepository).delete(exam);
+	}
+
+	@Test
+	void shouldThrowExceptionWhenDeletingNonExistentExamByCode() {
+		when(examRepository.findByCode(anyString())).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> examService.deleteByExamCode(examDTO.getCode()));
+	}
+
+
+	@Test
 	void shouldMatchExamsByRoles() {
 		when(examRepository.matchByRoles(anySet())).thenReturn(List.of(exam));
 
