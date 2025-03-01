@@ -33,8 +33,20 @@ public class ExamController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ExamDTO> deleteExam(@PathVariable String id) {
+    public ResponseEntity<ExamDTO> deleteExamById(@PathVariable String id) {
         ExamDTO deletedExam = examService.deleteById(id);
+        return ResponseEntity.ok(deletedExam);
+    }
+
+    @GetMapping
+    public ResponseEntity<ExamDTO> getExamByExamCode(@RequestParam String examCode) {
+        ExamDTO examDTO = examService.findByCode(examCode);
+        return ResponseEntity.ok(examDTO);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ExamDTO> deleteExamByExamCode(@RequestParam String examCode) {
+        ExamDTO deletedExam = examService.deleteByExamCode(examCode);
         return ResponseEntity.ok(deletedExam);
     }
 }

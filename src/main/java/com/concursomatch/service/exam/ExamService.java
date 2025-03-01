@@ -58,6 +58,13 @@ public class ExamService {
         return ExamAssembler.toDTO(entity);
     }
 
+    public ExamDTO deleteByExamCode(String examCode) {
+        Exam entity = examRepository.findByCode(examCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam not found with EXAM_CODE: " + examCode));
+        examRepository.delete(entity);
+        return ExamAssembler.toDTO(entity);
+    }
+
 	public List<SimplifiedExamDTO> matchByRoles(Set<String> roleNames) {
         List<Exam> matchedExams = examRepository.matchByRoles(roleNames);
         return ExamAssembler.toSimplifiedDTOList(matchedExams);
@@ -68,4 +75,5 @@ public class ExamService {
                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found with CODE: " + examCode));
         return ExamAssembler.toDTO(entity);
     }
+
 }
