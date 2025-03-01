@@ -64,7 +64,7 @@ public class CandidateService {
 
     public CandidateDTO deleteByCitizenId(String id) {
         Candidate entity = candidateRepository.findByCitizenId(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with CITIZEN_ID: " + id));
         candidateRepository.delete(entity);
         return CandidateAssembler.toDTO(entity);
     }
