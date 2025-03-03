@@ -55,7 +55,7 @@ Run the following command to clone the project:
 
 ```bash
 git clone https://github.com/jhonatademuner/leds-devops.git
-cd leds-devops
+cd leds-devops 
 ```
 
 <h3>🛠️ Database Setup</h3>
