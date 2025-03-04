@@ -25,6 +25,32 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Check RDS Status
+        id: check-rds
+        run: |
+          RDS_STATUS=$(aws rds describe-db-instances --db-instance-identifier ${{ secrets.RDS_IDENTIFIER }} --query "DBInstances[0].DBInstanceStatus" --output text)
+          echo "Current RDS Status: $RDS_STATUS"
+          if [ "$RDS_STATUS" = "stopped" ]; then
+            echo "Starting RDS..."
+            aws rds start-db-instance --db-instance-identifier ${{ secrets.RDS_IDENTIFIER }}
+            while [ "$(aws rds describe-db-instances --db-instance-identifier ${{ secrets.RDS_IDENTIFIER }} --query 'DBInstances[0].DBInstanceStatus' --output text)" != "available" ]; do
+              echo "Waiting for RDS to be available..."
+              sleep 20
+            done
+          fi
+      - name: Check EC2 Status
+        id: check-ec2
+        run: |
+          EC2_STATUS=$(aws ec2 describe-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }} --query "Reservations[0].Instances[0].State.Name" --output text)
+          echo "Current EC2 Status: $EC2_STATUS"
+          if [ "$EC2_STATUS" = "stopped" ]; then
+            echo "Starting EC2..."
+            aws ec2 start-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
+            while [ "$(aws ec2 describe-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }} --query 'Reservations[0].Instances[0].State.Name' --output text)" != "running" ]; do
+              echo "Waiting for EC2 to be running..."
+              sleep 20
+            done
+          fi
       - name: Update db url
         run: sed -i 's|<db_url>|${{ secrets.DATABASE_URL }}|' src/main/resources/application.properties
       - name: Update db username
