@@ -188,7 +188,7 @@ This allows you to explore all available endpoints, test requests, and check req
       </a>
     </td>
   </tr>
-</table>
+</table> 
 
 <h2 id="contribute">📫 Contribute</h2>
 
