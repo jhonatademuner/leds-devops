@@ -32,3 +32,13 @@ variable "ami_id" {
   description = "Amazon Machine Image ID"
   default = "ami-0780816dd7ce942fd"
 }
+
+variable "gh_token" {
+  description = "GitHub token for Actions Runner"
+  type        = string
+}
+
+variable "docker_username" {
+  description = "Docker Hub Username"
+  type        = string
+}
