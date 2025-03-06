@@ -24,7 +24,6 @@ resource "aws_instance" "leds-devops" {
                 ./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token}
                 ./run.sh
                 sudo ./svc.sh install
-                sudo ./svc.sh start
 
                 # Install Docker
                 sudo apt-get update
@@ -35,6 +34,10 @@ resource "aws_instance" "leds-devops" {
                 # Mark the script as executed
                 touch /var/log/user_data_done
               fi
+
+              # Start actions-runner
+              cd ~/actions-runner/
+              sudo ./svc.sh start
 
               # Pull and run Docker container
               sudo docker pull ${var.docker_username}/leds-devops:latest
