@@ -110,7 +110,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        run: terraform apply -auto-approve -var "gh_token=${{ secrets.GH_TOKEN }}" -var "docker_username=${{ secrets.DOCKER_USERNAME }}"
+        run: terraform apply -auto-approve -var 'gh_token=${{ secrets.GH_TOKEN }}' -var 'docker_username=${{ secrets.DOCKER_USERNAME }}'
         working-directory: terraform
 
   deploy:
