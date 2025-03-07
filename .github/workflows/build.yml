@@ -104,13 +104,10 @@ jobs:
         run: terraform init
         working-directory: terraform
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
         working-directory: terraform
       - name: Terraform Apply
-        env:
-          TF_VAR_gh_token: ${{ secrets.GH_TOKEN }}
-          TF_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
         working-directory: terraform
 
   deploy:
