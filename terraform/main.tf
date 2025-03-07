@@ -12,8 +12,12 @@ resource "aws_instance" "leds-devops" {
   user_data = <<-EOF
               #!/bin/bash
 
-              # Check if the script has already run
-              if [ ! -f /var/log/user_data_done ]; then
+              FLAG_FILE="/var/lib/my_first_run_complete"
+
+              # Check if the flag file does not exists
+              if [ ! -f "$FLAG_FILE" ]; then
+
+                echo "Flag file not found. Running first-time initialization tasks..."
 
                 # Create actions-runner directory and download the runner
                 mkdir actions-runner && cd actions-runner
@@ -31,8 +35,10 @@ resource "aws_instance" "leds-devops" {
                 sudo usermod -aG docker $USER
                 newgrp docker
 
-                # Mark the script as executed
-                touch /var/log/user_data_done
+                # Mark that the initialization has run by creating the flag file
+                touch "$FLAG_FILE"
+              else
+                echo "Flag file exists. Skipping first-time initialization."
               fi
 
               # Start actions-runner
