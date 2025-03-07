@@ -24,9 +24,7 @@ resource "aws_instance" "leds-devops" {
                 curl -o actions-runner-linux-x64-2.322.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-linux-x64-2.322.0.tar.gz
                 echo "b13b784808359f31bc79b08a191f5f83757852957dd8fe3dbfcc38202ccf5768  actions-runner-linux-x64-2.322.0.tar.gz" | shasum -a 256 -c
                 tar xzf ./actions-runner-linux-x64-2.322.0.tar.gz
-                cd ~/actions-runner/
-                ./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token}
-                ./run.sh
+                ./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token} --unattended
                 sudo ./svc.sh install
 
                 # Install Docker
@@ -40,6 +38,8 @@ resource "aws_instance" "leds-devops" {
               else
                 echo "Flag file exists. Skipping first-time initialization."
               fi
+
+              echo "Running usual initialization tasks..."
 
               # Start actions-runner
               cd ~/actions-runner/
