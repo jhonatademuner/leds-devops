@@ -13,18 +13,29 @@ resource "aws_instance" "leds-devops" {
               #!/bin/bash
 
               FLAG_FILE="/var/lib/my_first_run_complete"
+              RUNNER_USER="ghuser"
 
               # Check if the flag file does not exists
               if [ ! -f "$FLAG_FILE" ]; then
 
                 echo "Flag file not found. Running first-time initialization tasks..."
 
+                echo "Creating user $RUNNER_USER..."
+                # Create a new user without a password and default info.
+                adduser --disabled-password --gecos "" "$RUNNER_USER"
+
+                # Ensure the user is not in the sudo group if you want to keep it non-admin
+                deluser "$RUNNER_USER" sudo
+
                 # Create actions-runner directory and download the runner
                 mkdir actions-runner && cd actions-runner
                 curl -o actions-runner-linux-x64-2.322.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-linux-x64-2.322.0.tar.gz
                 echo "b13b784808359f31bc79b08a191f5f83757852957dd8fe3dbfcc38202ccf5768  actions-runner-linux-x64-2.322.0.tar.gz" | shasum -a 256 -c
                 tar xzf ./actions-runner-linux-x64-2.322.0.tar.gz
-                ./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token} --unattended
+
+                sudo -u ${RUNNER_USER} bash -c "./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token} --unattended"
+
+
                 sudo ./svc.sh install
 
                 # Install Docker
