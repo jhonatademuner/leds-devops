@@ -52,7 +52,7 @@ resource "aws_instance" "leds-devops" {
               echo "Running usual initialization tasks..."
 
               # Start actions-runner
-              cd ~/actions-runner/
+              cd ~/../../actions-runner/
               sudo ./svc.sh start
 
               # Pull and run Docker container
