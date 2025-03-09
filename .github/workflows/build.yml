@@ -10,33 +10,43 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-22.04
     steps:
+
       - name: Checkout source
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'temurin'
+
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
       - name: Update db url
         run: sed -i 's|<db_url>|${{ secrets.DATABASE_URL }}|' src/main/resources/application.properties
+
       - name: Update db username
         run: sed -i 's|<db_username>|${{ secrets.DATABASE_USERNAME }}|' src/main/resources/application.properties
+
       - name: Update db password
         run: sed -i 's|<db_password>|${{ secrets.DATABASE_PASSWORD }}|' src/main/resources/application.properties
+
       - name: Build Project and Run Tests with Coverage
         run: mvn clean verify -Pcoverage -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest .
+
       - name: Publish image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
 
@@ -50,31 +60,39 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'temurin'
+
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
       - name: Update db url
         run: sed -i 's|<db_url>|${{ secrets.DATABASE_URL }}|' src/main/resources/application.properties
+
       - name: Update db username
         run: sed -i 's|<db_username>|${{ secrets.DATABASE_USERNAME }}|' src/main/resources/application.properties
+
       - name: Update db password
         run: sed -i 's|<db_password>|${{ secrets.DATABASE_PASSWORD }}|' src/main/resources/application.properties
+
       - name: Run Tests and Generate Coverage Report
         run: mvn clean verify -Pcoverage -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
       - name: Build and analyze with SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -86,6 +104,16 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
+      - name: 80% Quality Gate
+        run: |
+          QUALITY=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=jhonatademuner_leds-devops" \
+            | jq -r '.projectStatus.status')
+          if [ "$QUALITY" != "OK" ]; then
+            echo "Quality Gate failed! Please check SonarCloud for details: https://sonarcloud.io/dashboard?id=jhonatademuner_leds-devops"
+            exit 1
+          fi
+
 
   deploy:
     needs: build
@@ -94,6 +122,7 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
