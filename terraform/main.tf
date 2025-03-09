@@ -12,31 +12,34 @@ resource "aws_instance" "ec2-instance" {
   user_data = <<-EOF
               #!/bin/bash
 
-              FLAG_FILE="/var/lib/my_first_run_complete"
+              SCRIPT_PATH="/var/lib/cloud/scripts/per-boot/docker_setup.sh"
 
-              # Check if the flag file does not exists
-              if [ ! -f "$FLAG_FILE" ]; then
+              # Write the script to ensure it runs on every boot
+              cat << 'EOT' > $SCRIPT_PATH
+              #!/bin/bash
 
-                echo "Flag file not found. Running first-time initialization tasks..."
-
-
-                # Install Docker
-                sudo apt-get update
-                sudo apt-get install docker.io -y
-                sudo usermod -aG docker $USER
-                newgrp docker
-
-                # Mark that the initialization has run by creating the flag file
-                touch "$FLAG_FILE"
+              # Check if Docker is installed
+              if ! command -v docker &> /dev/null; then
+                  echo "Docker not found. Installing..."
+                  sudo apt-get update
+                  sudo apt-get install -y docker.io
+                  sudo usermod -aG docker $USER
+                  newgrp docker
               else
-                echo "Flag file exists. Skipping first-time initialization."
+                  echo "Docker is already installed."
               fi
 
-              echo "Running usual initialization tasks..."
+              # Ensure no previous container is running
+              docker stop leds-devops-container || true
+              docker rm leds-devops-container || true
 
               # Pull and run Docker container
-              sudo docker pull ${var.docker_username}/leds-devops:latest
-              sudo docker run -d -p 8080:8080 --name leds-devops-container ${var.docker_username}/leds-devops:latest
+              docker pull ${var.docker_username}/leds-devops:latest
+              docker run -d -p 8080:8080 --name leds-devops-container ${var.docker_username}/leds-devops:latest
+              EOT
+
+              # Make script executable
+              chmod +x $SCRIPT_PATH
               EOF
 
   tags = {
