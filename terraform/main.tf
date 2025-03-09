@@ -41,6 +41,9 @@ resource "aws_instance" "ec2-instance" {
 
               # Make the script executable
               chmod +x /var/lib/cloud/scripts/per-boot/startup.sh
+
+              # Manually call the startup script for the first launch
+              /var/lib/cloud/scripts/per-boot/startup.sh
               EOF
 
   tags = {
