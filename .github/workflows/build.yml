@@ -41,7 +41,7 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
 
 
-  sonar:
+  analysis:
     needs: build
     name: SonarQube Analysis
     runs-on: ubuntu-22.04
@@ -87,9 +87,9 @@ jobs:
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
 
-  ensure-instance:
+  deploy:
     needs: build
-    name: Ensure EC2 Instance is Running or Created
+    name: Create or Start EC2 Instance
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout source
@@ -101,27 +101,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Check Instance State
-        id: check_state
-        run: |
-          # Look up the instance by its Name tag (INSTANCE_NAME should match your Terraform tag)
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
-            --query "Reservations[].Instances[].InstanceId" \
-            --output text)
-          echo "Instance ID: $INSTANCE_ID"
-          
-          if [ -z "$INSTANCE_ID" ]; then
-            echo "Instance not found."
-            echo "::set-output name=state::notfound"
-          else
-            STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID \
-              --query "Reservations[].Instances[].State.Name" \
-              --output text)
-            echo "Instance state is: $STATE"
-            echo "::set-output name=state::$STATE"
-          fi
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
@@ -130,8 +109,8 @@ jobs:
         run: |
           echo "Instance not found. Running Terraform apply to create the instance."
           terraform init
-          terraform plan -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}" -var="instance_name=${{ secrets.INSTANCE_NAME }}"
-          terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}" -var="instance_name=${{ secrets.INSTANCE_NAME }}"
+          terraform plan -var="docker_username=${{ secrets.DOCKER_USERNAME }}" -var="instance_name=${{ secrets.INSTANCE_NAME }}"
+          terraform apply -auto-approve -var="docker_username=${{ secrets.DOCKER_USERNAME }}" -var="instance_name=${{ secrets.INSTANCE_NAME }}"
         working-directory: terraform
 
       - name: Start Instance if Stopped
@@ -144,39 +123,3 @@ jobs:
           echo "Starting instance $INSTANCE_ID..."
           aws ec2 start-instances --instance-ids $INSTANCE_ID
           echo "Instance started."
-
-      - name: Wait for instance configuration to complete
-        run: |
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
-            --query "Reservations[].Instances[].InstanceId" \
-            --output text)
-          echo "Waiting for instance configuration tag..."
-          for i in {1..60}; do
-            STATUS=$(aws ec2 describe-tags \
-              --filters "Name=resource-id,Values=$INSTANCE_ID" "Name=key,Values=ConfigurationStatus" \
-              --query "Tags[].Value" \
-              --output text)
-            if [ "$STATUS" == "complete" ]; then
-               echo "Instance configuration complete"
-               exit 0
-            else
-               echo "Not configured yet, sleeping..."
-               sleep 10
-            fi
-          done
-          echo "Instance did not complete configuration in time"
-          exit 1
-  
-  deploy:
-    needs: ensure-instance
-    name: Deploy Docker Image on AWS EC2 Instance
-    runs-on:
-      - leds-ec2-ghrunner
-    steps:
-      - name: Pull image from Docker Hub
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
-      - name: Delete old container
-        run: sudo docker rm -f leds-devops-container || true
-      - name: Run Docker Container
-        run: sudo docker run -d -p 8080:8080 --name leds-devops-container ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest

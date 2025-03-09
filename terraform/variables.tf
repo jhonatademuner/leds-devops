@@ -28,11 +28,6 @@ variable "security_group_id" {
   default     = "sg-09b02afac31b0ee7c"
 }
 
-variable "instance_name" {
-  description = "Tag name for the EC2 instance"
-  type        = string
-}
-
 variable "ami_id" {
   description = "Amazon Machine Image ID"
   type        = string
@@ -40,8 +35,8 @@ variable "ami_id" {
 }
 
 
-variable "gh_token" {
-  description = "GitHub token for Actions Runner"
+variable "instance_name" {
+  description = "Tag name for the EC2 instance"
   type        = string
 }
 
