@@ -104,6 +104,26 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Check Instance State
+        id: check_state
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+          echo "Instance ID: $INSTANCE_ID"
+          
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "Instance not found."
+            echo "::set-output name=state::notfound"
+          else
+            STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID \
+              --query "Reservations[].Instances[].State.Name" \
+              --output text)
+            echo "Instance state is: $STATE"
+            echo "::set-output name=state::$STATE"
+          fi
+
       - name: Create Instance if Not Found
         if: steps.check_state.outputs.state == 'notfound'
         run: |
