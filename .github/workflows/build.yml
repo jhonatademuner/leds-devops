@@ -87,9 +87,9 @@ jobs:
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
 
-  terraform:
+  ensure-instance:
     needs: build
-    name: Terraform Apply
+    name: Ensure EC2 Instance is Running or Created
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout source
@@ -100,21 +100,53 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Check Instance State
+        id: check_state
+        run: |
+          # Look up the instance by its Name tag (INSTANCE_NAME should match your Terraform tag)
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+          echo "Instance ID: $INSTANCE_ID"
+          
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "Instance not found."
+            echo "::set-output name=state::notfound"
+          else
+            STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID \
+              --query "Reservations[].Instances[].State.Name" \
+              --output text)
+            echo "Instance state is: $STATE"
+            echo "::set-output name=state::$STATE"
+          fi
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
-      - name: Terraform Plan
-        run: terraform plan -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
-        working-directory: terraform
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
+
+      - name: Create Instance if Not Found
+        if: steps.check_state.outputs.state == 'notfound'
+        run: |
+          echo "Instance not found. Running Terraform apply to create the instance."
+          terraform init
+          terraform plan -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
+          terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
         working-directory: terraform
 
+      - name: Start Instance if Stopped
+        if: steps.check_state.outputs.state == 'stopped'
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+          echo "Starting instance $INSTANCE_ID..."
+          aws ec2 start-instances --instance-ids $INSTANCE_ID
+          echo "Instance started."
 
   deploy:
-    needs: terraform
+    needs: ensure-instance
     name: Deploy Docker Image on AWS EC2 Instance
     runs-on:
       - leds-ec2-ghrunner
