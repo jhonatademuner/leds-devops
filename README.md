@@ -91,7 +91,7 @@ Explanation of the parameters:
 - `-v postgres_data:/var/lib/postgresql/data` → Persists database data in a Docker volume
 - `-d postgres:16` → Runs the container in the background using PostgreSQL 16
 
-<b>3️⃣ Verify if the Container is Running</b>
+<b>3️⃣ Verify if the Container is Running</b> 
 
 ```bash
 docker ps
