@@ -12,34 +12,58 @@ resource "aws_instance" "ec2-instance" {
   user_data = <<-EOF
               #!/bin/bash
 
-              SCRIPT_PATH="/var/lib/cloud/scripts/per-boot/docker_setup.sh"
-
-              # Write the script to ensure it runs on every boot
-              cat << 'EOT' > $SCRIPT_PATH
+              # Write the script to the cloud-init per-boot directory
+              cat > /var/lib/cloud/scripts/per-boot/user-script.sh << 'EOT'
               #!/bin/bash
 
-              # Check if Docker is installed
+              # Redirect all output to console (visible in EC2 system log)
+              exec > >(tee /dev/console) 2>&1
+              set -x
+
+              # Log header with timestamp
+              echo "===== STARTING PER-BOOT SCRIPT - $(date) ====="
+
+              # Function to handle errors
+              handle_error() {
+                echo "ERROR at line $1: $2"
+                exit 1
+              }
+
+              trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
+              # Docker installation block
+              echo "[$(date)] Checking Docker installation..."
               if ! command -v docker &> /dev/null; then
-                  echo "Docker not found. Installing..."
+                  echo "[$(date)] Installing Docker..."
                   sudo apt-get update
                   sudo apt-get install -y docker.io
-                  sudo usermod -aG docker $USER
+                  sudo usermod -aG docker ubuntu
                   newgrp docker
+                  echo "[$(date)] Docker installed successfully"
               else
-                  echo "Docker is already installed."
+                  echo "[$(date)] Docker already installed"
               fi
 
-              # Ensure no previous container is running
-              docker stop leds-devops-container || true
-              docker rm leds-devops-container || true
+              # Container management block
+              echo "[$(date)] Stopping existing container..."
+              docker stop leds-devops-container || echo "No running container to stop"
+              docker rm leds-devops-container || echo "No container to remove"
 
-              # Pull and run Docker container
+              echo "[$(date)] Pulling latest Docker image..."
               docker pull ${var.docker_username}/leds-devops:latest
+
+              echo "[$(date)] Starting new container..."
               docker run -d -p 8080:8080 --name leds-devops-container ${var.docker_username}/leds-devops:latest
+
+              echo "[$(date)] Script completed successfully"
               EOT
 
-              # Make script executable
-              chmod +x $SCRIPT_PATH
+              # Make the script executable
+              chmod +x /var/lib/cloud/scripts/per-boot/user-script.sh
+
+              # Initial execution with logging
+              echo "===== RUNNING INITIAL SETUP - $(date) =====" | tee /dev/console
+              /var/lib/cloud/scripts/per-boot/user-script.sh
               EOF
 
   tags = {

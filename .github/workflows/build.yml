@@ -124,7 +124,7 @@ jobs:
             echo "::set-output name=state::$STATE"
           fi
 
-      - name: Create Instance if Not Found
+      - name: Create Instance if Not Found or Terminated
         if: steps.check_state.outputs.state == 'notfound' || steps.check_state.outputs.state == 'terminated'
         run: |
           echo "Instance not found. Running Terraform apply to create the instance."
