@@ -145,6 +145,25 @@ jobs:
           aws ec2 start-instances --instance-ids $INSTANCE_ID
           echo "Instance started."
 
+      - name: Wait for Instance to be Ready
+        id: wait_instance
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+          STATE=""
+          while [ "$STATE" != "running" ]; do
+            echo "Waiting for instance $INSTANCE_ID to be running..."
+            STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID \
+              --query "Reservations[].Instances[].State.Name" \
+              --output text)
+            echo "Current state: $STATE"
+            sleep 10
+          done
+          echo "Instance is running."
+          echo "::set-output name=ready::true"
+
   deploy:
     needs: ensure-instance
     name: Deploy Docker Image on AWS EC2 Instance
