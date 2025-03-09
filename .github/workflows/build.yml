@@ -130,8 +130,8 @@ jobs:
         run: |
           echo "Instance not found. Running Terraform apply to create the instance."
           terraform init
-          terraform plan -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
-          terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
+          terraform plan -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}" -var="instance_name=${{ secrets.INSTANCE_NAME }}"
+          terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}" -var="instance_name=${{ secrets.INSTANCE_NAME }}"
         working-directory: terraform
 
       - name: Start Instance if Stopped

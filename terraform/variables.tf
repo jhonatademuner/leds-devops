@@ -31,7 +31,6 @@ variable "security_group_id" {
 variable "instance_name" {
   description = "Tag name for the EC2 instance"
   type        = string
-  default     = "leds-devops"
 }
 
 variable "ami_id" {
