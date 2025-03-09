@@ -125,7 +125,7 @@ jobs:
           fi
 
       - name: Create Instance if Not Found
-        if: steps.check_state.outputs.state == 'notfound'
+        if: steps.check_state.outputs.state == 'notfound' || steps.check_state.outputs.state == 'terminated'
         run: |
           echo "Instance not found. Running Terraform apply to create the instance."
           terraform init
