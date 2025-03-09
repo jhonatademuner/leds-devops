@@ -33,7 +33,7 @@ resource "aws_instance" "leds-devops" {
                 echo "b13b784808359f31bc79b08a191f5f83757852957dd8fe3dbfcc38202ccf5768  actions-runner-linux-x64-2.322.0.tar.gz" | shasum -a 256 -c
                 tar xzf ./actions-runner-linux-x64-2.322.0.tar.gz
 
-                sudo -u $RUNNER_USER bash -c "./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token} --unattended"
+                sudo -u $RUNNER_USER bash -c "./config.sh --url https://github.com/jhonatademuner/leds-devops --token ${var.gh_token} --unattended --name leds-ec2-ghrunner"
 
                 sudo ./svc.sh install
 

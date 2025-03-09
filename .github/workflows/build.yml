@@ -40,6 +40,7 @@ jobs:
       - name: Publish image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
 
+
   sonar:
     needs: build
     name: SonarQube Analysis
@@ -85,6 +86,7 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
+
   terraform:
     needs: build
     name: Terraform Apply
@@ -110,11 +112,12 @@ jobs:
         run: terraform apply -auto-approve -var="gh_token=${{ secrets.GH_TOKEN }}" -var="docker_username=${{ secrets.DOCKER_USERNAME }}"
         working-directory: terraform
 
+
   deploy:
     needs: terraform
     name: Deploy Docker Image on AWS EC2 Instance
     runs-on:
-      - aws-ec2-leds-devops
+      - leds-ec2-ghrunner
     steps:
       - name: Pull image from Docker Hub
         run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/leds-devops:latest
