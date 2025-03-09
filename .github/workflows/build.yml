@@ -145,24 +145,20 @@ jobs:
           aws ec2 start-instances --instance-ids $INSTANCE_ID
           echo "Instance started."
 
-      - name: Wait for Instance to be Ready
-        id: wait_instance
+      - name: Wait for Docker container to be ready
         run: |
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=${{ secrets.INSTANCE_NAME }}" \
-            --query "Reservations[].Instances[].InstanceId" \
-            --output text)
-          STATE=""
-          while [ "$STATE" != "running" ]; do
-            echo "Waiting for instance $INSTANCE_ID to be running..."
-            STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID \
-              --query "Reservations[].Instances[].State.Name" \
-              --output text)
-            echo "Current state: $STATE"
-            sleep 10
+          echo "Waiting for Docker container to be ready..."
+          for i in {1..60}; do
+            if sudo docker inspect -f '{{.State.Running}}' leds-devops-container 2>/dev/null | grep true; then
+              echo "Docker container is running."
+              exit 0
+            else
+              echo "Docker container not running yet, sleeping..."
+              sleep 10
+            fi
           done
-          echo "Instance is running."
-          echo "::set-output name=ready::true"
+          echo "Docker container did not start in time."
+          exit 1
 
   deploy:
     needs: ensure-instance
