@@ -58,6 +58,10 @@ resource "aws_instance" "leds-devops" {
               # Pull and run Docker container
               sudo docker pull ${var.docker_username}/leds-devops:latest
               sudo docker run -d -p 8080:8080 --name leds-devops-container ${var.docker_username}/leds-devops:latest
+
+              # Mark configuration complete by tagging the instance (requires proper IAM permissions)
+              INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+              aws ec2 create-tags --resources $INSTANCE_ID --tags Key=ConfigurationStatus,Value=complete --region ${var.aws_region}
               EOF
 
   tags = {
